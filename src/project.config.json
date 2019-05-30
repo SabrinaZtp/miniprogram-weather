@@ -9,8 +9,8 @@
 	},
 	"compileType": "miniprogram",
 	"libVersion": "1.9.93",
-	"appid": "touristappid",
-	"projectname": "weather",
+	"appid": "wx986ccb78c757c2b3",
+	"projectname": "sabrina-wechat-weather",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {
