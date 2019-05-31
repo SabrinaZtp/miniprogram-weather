@@ -21,10 +21,12 @@ Page({
     nowTemp: '',
     nowWeather: '',
     nowWeatherBackground: '',
-    hourlyWeather: [1,2,3,4,5]
+    hourlyWeather: [],
+    todayTemp: '',
+    todayWeather: ''
   },
   onPullDownRefresh() {
-    this.getNow(() => {
+    this.getWeather(() => {
       wx.stopPullDownRefresh()
     });
   },
@@ -44,6 +46,7 @@ Page({
         let result = res.data.result;
         this.setNow(result);
         this.setForecast(result);
+        this.setToday(result);
       },
       complete: () => {
         callback && callback();
@@ -76,5 +79,16 @@ Page({
     this.setData({
       hourlyWeather: hourlyWeather
     });
+  },
+  setToday(result) {
+    let date = new Date()
+    this.setData({
+      todayTemp: `${result.today.minTemp}° - ${result.today.maxTemp}°`,
+      todayDate: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} 今天`
+    })
+  },
+  onTapDayWeather() {
+    console.log("toast");
+    wx.showToast();
   }
 })
