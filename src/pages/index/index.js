@@ -88,7 +88,8 @@ Page({
     })
   },
   onTapDayWeather() {
-    console.log("toast");
-    wx.showToast();
+    wx.navigateTo({
+      url: '/pages/list/list'
+    })
   }
 })
