@@ -20,7 +20,8 @@ Page({
   data: {
     nowTemp: '',
     nowWeather: '',
-    nowWeatherBackground: ''
+    nowWeatherBackground: '',
+    hourlyWeather: [1,2,3,4,5]
   },
   onPullDownRefresh() {
     this.getNow(() => {
@@ -28,9 +29,9 @@ Page({
     });
   },
   onLoad() {
-    this.getNow();
+    this.getWeather();
   },
-  getNow(callback) {
+  getWeather(callback) {
     wx.request({
       url: 'https://test-miniprogram.com/api/weather/now',
       data: {
@@ -41,23 +42,39 @@ Page({
       },
       success: (res) => {
         let result = res.data.result;
-        let weather = result.now.weather;
-        let temp = result.now.temp;
-        console.log(weather + " " + temp);
-        this.setData({
-          nowTemp: temp + '°',
-          nowWeather: weatherMap[weather],
-          nowWeatherBackground: '/images/' + weather + '-bg.png'
-        });
-        wx.setNavigationBarColor({
-          frontColor: '#000000',
-          backgroundColor: weatherColorMap[weather],
-        });
+        this.setNow(result);
+        this.setForecast(result);
       },
       complete: () => {
         callback && callback();
       }
     })
+  },
+  setNow(result) {
+    let weather = result.now.weather;
+    let temp = result.now.temp;
+    this.setData({
+      nowTemp: temp + '°',
+      nowWeather: weatherMap[weather],
+      nowWeatherBackground: '/images/' + weather + '-bg.png'
+    });
+    wx.setNavigationBarColor({
+      frontColor: '#000000',
+      backgroundColor: weatherColorMap[weather],
+    });
+  },
+  setForecast(result) {
+    let nowHour = new Date().getHours();
+    let hourlyWeather = [];
+    for (let i = 0; i < 8; i++) {
+      let hourlyWeatherItem = {};
+      hourlyWeatherItem.time = (i * 3 + nowHour) % 24 + '时';
+      hourlyWeatherItem.iconPath = "/images/" + result.forecast[i].weather + "-icon.png";
+      hourlyWeatherItem.temp = result.forecast[i].temp;
+      hourlyWeather.push(hourlyWeatherItem);
+    }
+    this.setData({
+      hourlyWeather: hourlyWeather
+    });
   }
-  
 })
