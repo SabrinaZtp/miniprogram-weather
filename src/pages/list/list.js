@@ -2,6 +2,7 @@ const dayMap = ['星期日', '星期一', '星期二', '星期三', '星期四',
 
 Page({
   data: {
+    city: '',
     weekWeather: []
   },
   onPullDownRefresh() {
@@ -9,7 +10,11 @@ Page({
       wx.stopPullDownRefresh()
     });
   },
-  onLoad() {
+  onLoad(options) {
+    this.setData({
+      city: options.city
+    });
+    console.log(`page 2 ${options.city}`);
     this.getWeekWeather();
   },
   getWeekWeather(callback) {

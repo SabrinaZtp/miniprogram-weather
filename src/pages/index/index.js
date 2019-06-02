@@ -16,6 +16,10 @@ const weatherColorMap = {
   'snow': '#aae1fc'
 }
 
+const UNPROMPTED = 0;
+const UNAUTHORIZED = 1;
+const AUTHORIZED = 2;
+
 Page({
   data: {
     nowTemp: '',
@@ -23,7 +27,8 @@ Page({
     nowWeatherBackground: '',
     hourlyWeather: [],
     todayTemp: '',
-    todayWeather: ''
+    todayWeather: '',
+    locationAuthType: UNPROMPTED
   },
   onPullDownRefresh() {
     this.getWeather(() => {
@@ -31,6 +36,20 @@ Page({
     });
   },
   onLoad() {
+    wx.getSetting({
+      // this.data will be initialized everytime onLoad() excute, so we need to get existing auth data to set this.data
+      success: (res) => {
+        let auth = res.authSetting['scope.userLocation'];
+        let locationAuthType = auth ? AUTHORIZED 
+          : (auth===false) ? UNAUTHORIZED : UNPROMPTED;
+        this.setData({
+          locationAuthType: locationAuthType
+        });  
+        if (auth) {
+          // use existing city to get weather data
+        }
+      }
+    });
     this.getWeather();
   },
   getWeather(callback) {
@@ -89,7 +108,36 @@ Page({
   },
   onTapDayWeather() {
     wx.navigateTo({
-      url: '/pages/list/list'
+      url: '/pages/list/list?city='+'北京市'
+    })
+  },
+  onTapLocation() {
+    if (this.data.locationAuthType === UNAUTHORIZED) {
+      wx.openSetting({
+        success: (res) => {
+          let auth = res.authSetting['scope.userLocation'];
+          if (auth) {
+            this.getLocation();      
+          }
+        }
+      });
+    } else {
+      this.getLocation();
+    }
+  },
+  getLocation() {
+    wx.getLocation({
+      success: res => {
+        console.log(res.latitude, res.longitude);
+        this.setData({
+          locationAuthType: AUTHORIZED
+        });
+      },
+      fail: () => {
+        this.setData({
+          locationAuthType: UNAUTHORIZED
+        })
+      }
     })
   }
 })
